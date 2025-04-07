@@ -1,0 +1,130 @@
+MVC構成
+Model DBとのやりとり
+View ユーザーに表示する画面の生成
+controller ユーザーの入力に基づき、Model・Viewを制御
+Ruting ユーザーの依頼(リクエスト)に応じて、どの処理を動かすか判断
+
+MVC構成の採用理由
+・再利用性
+・可読性
+以上にすぐれ保守性を高める。
+
+レッスンで学ぶ内容
+Laravelのどのファイル・クラスがMVCのどれに該当するか
+MVCの処理の流れ
+
+
+#section4
+DBにテーブルを用意 Migration
+
+マイグレーションを使う理由
+・PHPコードでテーブル操作ができる
+・マイグレーションファイルをGitで共有、同じデーブルで開発者共有
+
+
+1,マイグレーションを用いてテーブルを作成
+artisanコマンド
+appコンテナ内で
+php artisan make:migration create_todos_table
+
+2. マイグレーションファイルに作成したいテーブル情報を追記
+
+database/migrations/{作成日時}_create_todos_table.php
+作成されたマイグレーションファイルのupメソッドに
+$table->string('content');
+を追加。マイグレーションファイルの作成完了
+
+3. マイグレーションを実行
+appコンテナ内
+php artisan migrate
+
+まとめ
+up : データベースに新しいテーブル、カラム、またはインデックスを追加するために使用します。
+down : upメソッドによって実行する操作と逆の操作を実装し、以前の状態へ戻す必要があります。
+
+
+#Section5
+Seeder シーダー テストデータの導入
+
+使用理由
+・SQLを直接書かずPHPコードで表現できるため可読性が高い
+・シーダーファイルをgit管理することで、テストデータを開発者間で共有できる
+
+1. シーダーファイルの作成
+artisanコマンドでシェーダーファイルを作成
+appコンテナ内
+php artisan make:seeder TodoSeeder
+
+2. シーダーファイルに作成したいテストデータ情報を記載
+run()メソッド内にテストデータを投入する実装が必要
+投入するテストデータ情報を連想配列の形で用意
+
+src/database/seeds/TodoSeeder.php
+public function run()
+    {
+        DB::table('todos')->truncate();　#truncateメソッドは該当のテーブルのレコードをすべて削除するTRUNCATE文を実行
+
+        $testData = [
+            [
+                'content' => 'PHP Appセクションを終える',　#テストデータ連想配列
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'content' => 'Laravel Lessonを終える',　#テストデータ連想配列
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ];
+
+        DB::table('todos')->insert($testData); #DB::table('todos')はtableメソッドの引数のテーブルを操作するための準備
+        　　　　　　　　　　　　　　　　　　　　　　　 #insertメソッドは引数のデータをテーブルに投入するINSERT文を実行。runメソッドが実行されればtodosテーブルに2件のテストコードを投入することができる。
+    }
+
+3. シーダークラスを登録
+src/database/seeds/DatabaseSeeder.phpのcallメソッドの登録　実行
+
+4.シーダーを実行
+callメソッドで実行
+appコンテナ内
+php artisan db:seed
+
+
+#Section 6
+ToDo一覧表示機能の作成 一覧画面のURIの設定
+Route::get()第一引数にURI,第二引数にURIとHTTPの組み合わせで実行したい処理を記述
+ルート定義
+
+#Section 7
+Controllerに処理を委譲することで保守性・可読性が高まる。
+view関数はresources/views/ 配下のHTMLファイルを指定し、HTMLを返す。
+
+#Section 8
+1、ORM（Eloquent）はclassとテーブルを紐づけてSQL文を意識せずにテーブル操作が可能
+2、src/app/Todo.phpと
+app/Http/Controllers/TodoController.php
+Modelインスタンスのallメソッドを実行することで、紐ずくテーブルのレコード情報を全件取得できる
+3、Collectionインスタンスは配列操作に特化したクラス
+
+#Section 9
+取得したデータを画面に渡す
+Section8では、DBからデータを受け取っただけ、ここでユーザーに見える様に表示処理
+
+app/Http/Controllers/TodoController.php
+view関数の第二引数の連想配列は[blade内での変数名 => 代入したい値]を意味します。
+
+#Section 10
+bladeファイル、HTMLに比べて、機能を実装することができる。
+
+ディレクティブ
+＠はPHP制御構文の短縮記述方法
+
+@foreach ($todos as $todo)
+$todos Controllerにて取得したCollectionインスタンスが代入
+
+{{ }}を用いてPHPの処理として認識
+$todo->content　$model->カラム名という記述で対応するレコードのカラム値を取得
+
+#Section 11
+新規作成画面表示
+Route::get('/todo/create', 'TodoController@create');
