@@ -10,11 +10,11 @@ class TodoController extends Controller
 {
     public function index()
     {
-        $todo = new Todo();
-        $todos = $todo->all();
+        $todo = new Todo(); #TodoControllerでTodoModelを使えるようにするために、インスタンス化。Todo.phpでマッピング
+        $todos = $todo->all(); #レコード全取得
         
 
-        return view('todo.index', ['todos' => $todos]);
+        return view('todo.index', ['todos' => $todos]);  #index.blade.phpファイルにデータを渡してる。
     }
 
     public function create()
@@ -22,11 +22,9 @@ class TodoController extends Controller
         return view('todo.create',);
     }
 
-    public function store(Request $request)
+    public function store(Request $request) 
     {
         $inputs = $request->all();
-        // dd($inputs);
-
         $todo = new Todo(); 
         $todo->fill($inputs);
         $todo->save();
