@@ -8,11 +8,16 @@ use App\Todo;
 
 class TodoController extends Controller
 {
+    private $todo;
+
+    public function __construct(Todo $todo)
+    {
+        $this->todo = $todo;
+    }
+
     public function index()
     {
-        $todo = new Todo(); #TodoControllerでTodoModelを使えるようにするために、インスタンス化。Todo.phpでマッピング
-        $todos = $todo->all(); #レコード全取得 allメゾットのデータ型を調べる。
-        // dd($todos);
+        $todos = $this->todo->all();
 
         return view('todo.index', ['todos' => $todos]);  #index.blade.phpファイルにデータを渡してる。
     }
@@ -29,17 +34,15 @@ class TodoController extends Controller
     public function store(Request $request) 
     {
         $inputs = $request->all(); #全ての値を取得
-        $todo = new Todo();
-        $todo->fill($inputs); #Todo.phpに一括代入
-        $todo->save();
+        $this->todo->fill($inputs);
+        $this->todo->save();
 
         return redirect()->route('todo.index');
     }
 
     public function show($id)
     {
-        $model = new Todo();
-        $todo = $model->find($id); 
+        $todo = $this->todo->find($id); 
 
         return view('todo.show', ['todo' => $todo]);
     }
