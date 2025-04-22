@@ -128,3 +128,38 @@ $todo->content　$model->カラム名という記述で対応するレコード�
 #Section 11
 新規作成画面表示
 Route::get('/todo/create', 'TodoController@create');
+
+#Section 13
+一括代入
+メソッドインジェクション
+ public function store(Request $request) 
+    {
+        $inputs = $request->all(); #全ての値を取得
+        $todo = new Todo();
+        $todo->fill($inputs); #Todo.phpに一括代入
+        $todo->save();
+
+        return redirect()->route('todo.index');
+    }
+    
+    
+#store(Request $request)
+Laravel の Request クラスは、HTTPリクエストに関する情報（パラメータ、ファイル、ヘッダーなど）にアクセスするための重要なコンポーネント
+public function store(Request $request)
+{
+    // 単一の入力値を取得
+    $name = $request->input('name');
+    
+    // デフォルト値を指定して取得
+    $page = $request->input('page', 1);
+    
+    // 全ての入力値を配列で取得
+    $all = $request->all();
+    
+    // 利用例: $all を元にモデルを作成するなど
+}
+
+口頭レビューの準備
+１ルートから
+２処理を省略せずに話す
+

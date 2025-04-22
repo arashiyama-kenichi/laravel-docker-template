@@ -11,10 +11,11 @@
               </div>
               <div class="list-group list-group-flush">
               @foreach ($todos as $todo)
-                  <div class="d-flex align-items-center p-2">
-                    <span class="col-9">{{ $todo->content }}</span>
-                  </div>
-                @endforeach
+              <!-- １行しか書かれてないのに、複数の行が表示されるか -->
+                <div class="d-flex align-items-center p-2">
+                  <span class="col-9">{{ $todo->content }}</span>
+                </div>
+              @endforeach
               </div>
             </div>
           </div>
